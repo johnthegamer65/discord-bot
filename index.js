@@ -82,9 +82,7 @@ client.on("messageCreate", async (message) => {
   }
 
   const member = message.member;
-  if (!member || !member.roles.cache.has(config.TRIGGER_ROLE_ID)) {
-    return message.reply("❌ You don't have permission to use this command.");
-  }
+  if (!member || !config.TRIGGER_ROLE_ID.some(id => member.roles.cache.has(id))) {
 
   if (config.DELETE_COMMAND_MESSAGE) {
     await message.delete().catch(() => {});
