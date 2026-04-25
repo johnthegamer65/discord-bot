@@ -27,7 +27,7 @@ module.exports = {
     BANNER_URL: "https://ik.imagekit.io/8uafykfsx/p58Lbvz.png?updatedAt=1774712949801",
 
     // Large heading shown below the banner
-    TITLE: "Department Shift Callout – Recommended",
+    TITLE: "Hillsborough County Communications - Shift Callout",
 
     // Body text — {mention} is replaced with whoever ran the command
     BODY:
