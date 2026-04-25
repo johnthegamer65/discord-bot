@@ -12,9 +12,8 @@ const {
 const config = require("./config");
 
 console.log("=== BOT STARTING ===");
-console.log("Node version:", process.version);
 console.log("Token set:", config.TOKEN && config.TOKEN !== "YOUR_BOT_TOKEN_HERE" ? "YES" : "NO - TOKEN IS NOT SET");
-console.log("Trigger role:", config.TRIGGER_ROLE_ID);
+console.log("Trigger roles:", config.TRIGGER_ROLE_ID);
 console.log("Ping role:", config.PING_ROLE_ID);
 console.log("Attempting to connect to Discord...");
 
@@ -26,16 +25,6 @@ const client = new Client({
   ],
   partials: [Partials.Message, Partials.Channel],
 });
-
-// If not logged in after 15 seconds, report it
-const loginTimeout = setTimeout(() => {
-  console.error("❌ TIMEOUT: Could not connect to Discord after 15 seconds.");
-  console.error("   Possible causes:");
-  console.error("   1. Invalid bot token");
-  console.error("   2. Wispbyte is blocking Discord WebSocket connections");
-  console.error("   3. Discord API is down");
-  process.exit(1);
-}, 15000);
 
 function buildCalloutComponents(triggerMember) {
   const { EMBED } = config;
@@ -82,7 +71,13 @@ client.on("messageCreate", async (message) => {
   }
 
   const member = message.member;
-  if (!member || !config.TRIGGER_ROLE_ID.some(id => member.roles.cache.has(id))) {
+  const hasRole = Array.isArray(config.TRIGGER_ROLE_ID)
+    ? config.TRIGGER_ROLE_ID.some(id => member.roles.cache.has(id))
+    : member.roles.cache.has(config.TRIGGER_ROLE_ID);
+
+  if (!member || !hasRole) {
+    return message.reply("❌ You don't have permission to use this command.");
+  }
 
   if (config.DELETE_COMMAND_MESSAGE) {
     await message.delete().catch(() => {});
@@ -104,18 +99,16 @@ client.on("messageCreate", async (message) => {
     console.error("[Callout] Failed to send callout embed:", err);
     message.reply("❌ Failed to send the callout.").catch(() => {});
   }
-};
+});
 
 client.once("ready", () => {
-  clearTimeout(loginTimeout);
   console.log(`✅  Logged in as ${client.user.tag}`);
   console.log(`   Command: ${config.PREFIX}${config.COMMAND}`);
-  console.log(`   Trigger role: ${config.TRIGGER_ROLE_ID}`);
-  console.log(`   Ping role:    ${config.PING_ROLE_ID}`);
+  console.log(`   Trigger roles: ${config.TRIGGER_ROLE_ID}`);
+  console.log(`   Ping role: ${config.PING_ROLE_ID}`);
 });
 
 client.login(config.TOKEN).catch(err => {
-  clearTimeout(loginTimeout);
   console.error("❌ LOGIN FAILED:", err.message);
   process.exit(1);
 });
