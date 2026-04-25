@@ -11,7 +11,7 @@ module.exports = {
 
   // ----- Role IDs -----
   // Only members with this role can run !callout
-  TRIGGER_ROLE_ID: "1479582865980129440", "1479582865980129435",
+  TRIGGER_ROLE_ID: ["1479582865980129440", "1479582865980129435"],
 
   // Role that gets pinged when the callout is sent (e.g. Department Personnel)
   PING_ROLE_ID: "1479582865972007051",
