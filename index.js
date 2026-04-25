@@ -7,6 +7,8 @@ const {
   TextDisplayBuilder,
   SeparatorBuilder,
   SeparatorSpacingSize,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
 } = require("discord.js");
 
 const config = require("./config");
@@ -35,9 +37,21 @@ function buildCalloutComponents(triggerMember) {
   );
 
   const container = new ContainerBuilder()
-    .setAccentColor(EMBED.ACCENT_COLOR)
+    .setAccentColor(EMBED.ACCENT_COLOR);
+
+  // Banner image at the top
+  if (EMBED.BANNER_URL) {
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(EMBED.BANNER_URL)
+      )
+    );
+  }
+
+  // Large bold title
+  container
     .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`**${EMBED.TITLE}**`)
+      new TextDisplayBuilder().setContent(`# ${EMBED.TITLE}`)
     )
     .addSeparatorComponents(
       new SeparatorBuilder()
