@@ -104,7 +104,7 @@ client.on("messageCreate", async (message) => {
     console.error("[Callout] Failed to send callout embed:", err);
     message.reply("❌ Failed to send the callout.").catch(() => {});
   }
-});
+};
 
 client.once("ready", () => {
   clearTimeout(loginTimeout);
