@@ -10,7 +10,7 @@ module.exports = {
     BANNER_URL: null,
 
     // Thumbnail/badge shown — set to null to disable
-    THUMBNAIL_URL: "https://ik.imagekit.io/8uafykfsx/0f045eb53e69d5c20e14642d96200db6.png?updatedAt=1774713500214",
+    THUMBNAIL_URL: "https://ik.imagekit.io/8uafykfsx/p58Lbvz.png?updatedAt=1774712949801",
 
     // Welcome message body
     // {mention} = the new member's @mention
