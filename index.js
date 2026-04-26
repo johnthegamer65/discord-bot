@@ -88,6 +88,19 @@ function buildWelcomeComponents(member) {
     new TextDisplayBuilder().setContent(bodyText)
   );
 
+  // Separator + thumbnail image at the bottom
+  if (EMBED.THUMBNAIL_URL) {
+    container
+      .addSeparatorComponents(
+        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+      )
+      .addMediaGalleryComponents(
+        new MediaGalleryBuilder().addItems(
+          new MediaGalleryItemBuilder().setURL(EMBED.THUMBNAIL_URL)
+        )
+      );
+  }
+
   if (EMBED.FOOTER) {
     container
       .addSeparatorComponents(
@@ -108,7 +121,6 @@ client.on("guildMemberAdd", async (member) => {
 
   try {
     const container = buildWelcomeComponents(member);
-    // Send ping and embed as separate messages — content cannot be used with IS_COMPONENTS_V2
     await channel.send(`<@${member.id}>`);
     await channel.send({
       components: [container],
@@ -147,7 +159,6 @@ client.on("messageCreate", async (message) => {
   try {
     const container = buildCalloutComponents(member);
 
-    // Send role ping as plain message — cannot combine content with IS_COMPONENTS_V2
     await message.channel.send({
       content: `<@&${config.PING_ROLE_ID}>`,
       allowedMentions: { roles: [config.PING_ROLE_ID] },
