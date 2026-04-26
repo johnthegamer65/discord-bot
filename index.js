@@ -15,7 +15,7 @@ const config = require("./config");
 const welcomeConfig = require("./welcome-config");
 
 console.log("=== BOT STARTING ===");
-console.log("Token set:", config.TOKEN && config.TOKEN !== "YOUR_BOT_TOKEN_HERE" ? "YES" : "NO - TOKEN IS NOT SET");
+console.log("Token set:", config.TOKEN ? "YES" : "NO");
 
 const client = new Client({
   intents: [
@@ -36,8 +36,7 @@ function buildCalloutComponents(triggerMember) {
     triggerMember ? `<@${triggerMember.id}>` : "@unknown"
   );
 
-  const container = new ContainerBuilder()
-    .setAccentColor(EMBED.ACCENT_COLOR);
+  const container = new ContainerBuilder().setAccentColor(EMBED.ACCENT_COLOR);
 
   if (EMBED.BANNER_URL) {
     container.addMediaGalleryComponents(
@@ -75,8 +74,7 @@ function buildWelcomeComponents(member) {
     .replace(/{mention}/g, `<@${member.id}>`)
     .replace(/{server}/g, member.guild.name);
 
-  const container = new ContainerBuilder()
-    .setAccentColor(EMBED.ACCENT_COLOR);
+  const container = new ContainerBuilder().setAccentColor(EMBED.ACCENT_COLOR);
 
   if (EMBED.BANNER_URL) {
     container.addMediaGalleryComponents(
@@ -110,9 +108,10 @@ client.on("guildMemberAdd", async (member) => {
 
   try {
     const container = buildWelcomeComponents(member);
+    // Send ping and embed as separate messages — content cannot be used with IS_COMPONENTS_V2
+    await channel.send(`<@${member.id}>`);
     await channel.send({
-      content: `<@${member.id}>`,
-      components: [[container]],
+      components: [container],
       flags: MessageFlags.IsComponentsV2,
     });
   } catch (err) {
@@ -148,13 +147,14 @@ client.on("messageCreate", async (message) => {
   try {
     const container = buildCalloutComponents(member);
 
+    // Send role ping as plain message — cannot combine content with IS_COMPONENTS_V2
     await message.channel.send({
       content: `<@&${config.PING_ROLE_ID}>`,
       allowedMentions: { roles: [config.PING_ROLE_ID] },
     });
 
     await message.channel.send({
-      components: [[container]],
+      components: [container],
       flags: MessageFlags.IsComponentsV2,
     });
   } catch (err) {
