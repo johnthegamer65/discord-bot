@@ -116,7 +116,11 @@ client.on("guildMemberAdd", async (member) => {
       flags: MessageFlags.IsComponentsV2,
     });
   } catch (err) {
-    console.error("[Welcome] Failed to send welcome message:", err);
+    console.error(
+      `[Welcome] Failed to send welcome message for ${member.user.tag} (${member.id}) ` +
+      `in guild "${member.guild.name}" (${member.guild.id}):`,
+      err
+    );
   }
 });
 
@@ -151,9 +155,6 @@ client.on("messageCreate", async (message) => {
     await message.channel.send({
       content: `<@&${config.PING_ROLE_ID}>`,
       allowedMentions: { roles: [config.PING_ROLE_ID] },
-    });
-
-    await message.channel.send({
       components: [container],
       flags: MessageFlags.IsComponentsV2,
     });
@@ -168,6 +169,22 @@ client.once("ready", () => {
   console.log(`✅  Logged in as ${client.user.tag}`);
   console.log(`   Callout command: ${config.PREFIX}${config.COMMAND}`);
   console.log(`   Welcome channel: ${welcomeConfig.WELCOME_CHANNEL_ID}`);
+
+  // Validate the welcome channel exists and the bot can send messages there
+  const welcomeChannel = client.channels.cache.get(welcomeConfig.WELCOME_CHANNEL_ID);
+  if (!welcomeChannel) {
+    console.warn(
+      `⚠️  [Welcome] Channel ID "${welcomeConfig.WELCOME_CHANNEL_ID}" not found. ` +
+      "Welcome messages will not be sent until this is corrected."
+    );
+  } else if (!welcomeChannel.permissionsFor(client.user)?.has("SendMessages")) {
+    console.warn(
+      `⚠️  [Welcome] Bot lacks SendMessages permission in channel "${welcomeConfig.WELCOME_CHANNEL_ID}". ` +
+      "Welcome messages may fail."
+    );
+  } else {
+    console.log(`   Welcome channel validated: #${welcomeChannel.name}`);
+  }
 });
 
 client.login(config.TOKEN).catch(err => {
