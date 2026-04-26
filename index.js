@@ -12,22 +12,22 @@ const {
 } = require("discord.js");
 
 const config = require("./config");
+const welcomeConfig = require("./welcome-config");
 
 console.log("=== BOT STARTING ===");
 console.log("Token set:", config.TOKEN && config.TOKEN !== "YOUR_BOT_TOKEN_HERE" ? "YES" : "NO - TOKEN IS NOT SET");
-console.log("Trigger roles:", config.TRIGGER_ROLE_ID);
-console.log("Ping role:", config.PING_ROLE_ID);
-console.log("Attempting to connect to Discord...");
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.MessageContent,
   ],
   partials: [Partials.Message, Partials.Channel],
 });
 
+// ---- Callout embed builder ----
 function buildCalloutComponents(triggerMember) {
   const { EMBED } = config;
 
@@ -39,7 +39,6 @@ function buildCalloutComponents(triggerMember) {
   const container = new ContainerBuilder()
     .setAccentColor(EMBED.ACCENT_COLOR);
 
-  // Banner image at the top
   if (EMBED.BANNER_URL) {
     container.addMediaGalleryComponents(
       new MediaGalleryBuilder().addItems(
@@ -48,23 +47,18 @@ function buildCalloutComponents(triggerMember) {
     );
   }
 
-  // Large bold title
   container
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`# ${EMBED.TITLE}`)
     )
     .addSeparatorComponents(
-      new SeparatorBuilder()
-        .setSpacing(SeparatorSpacingSize.Small)
-        .setDivider(true)
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(bodyText)
     )
     .addSeparatorComponents(
-      new SeparatorBuilder()
-        .setSpacing(SeparatorSpacingSize.Small)
-        .setDivider(false)
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(false)
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`-# ${EMBED.FOOTER}`)
@@ -73,6 +67,60 @@ function buildCalloutComponents(triggerMember) {
   return container;
 }
 
+// ---- Welcome embed builder ----
+function buildWelcomeComponents(member) {
+  const { EMBED } = welcomeConfig;
+
+  const bodyText = EMBED.BODY
+    .replace(/{mention}/g, `<@${member.id}>`)
+    .replace(/{server}/g, member.guild.name);
+
+  const container = new ContainerBuilder()
+    .setAccentColor(EMBED.ACCENT_COLOR);
+
+  if (EMBED.BANNER_URL) {
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(EMBED.BANNER_URL)
+      )
+    );
+  }
+
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent(bodyText)
+  );
+
+  if (EMBED.FOOTER) {
+    container
+      .addSeparatorComponents(
+        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(false)
+      )
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`-# ${EMBED.FOOTER}`)
+      );
+  }
+
+  return container;
+}
+
+// ---- Welcome event ----
+client.on("guildMemberAdd", async (member) => {
+  const channel = member.guild.channels.cache.get(welcomeConfig.WELCOME_CHANNEL_ID);
+  if (!channel) return;
+
+  try {
+    const container = buildWelcomeComponents(member);
+    await channel.send({
+      content: `<@${member.id}>`,
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+    });
+  } catch (err) {
+    console.error("[Welcome] Failed to send welcome message:", err);
+  }
+});
+
+// ---- Callout command ----
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
   if (!message.content.toLowerCase().startsWith(`${config.PREFIX}${config.COMMAND}`)) return;
@@ -115,11 +163,11 @@ client.on("messageCreate", async (message) => {
   }
 });
 
+// ---- Ready ----
 client.once("ready", () => {
   console.log(`✅  Logged in as ${client.user.tag}`);
-  console.log(`   Command: ${config.PREFIX}${config.COMMAND}`);
-  console.log(`   Trigger roles: ${config.TRIGGER_ROLE_ID}`);
-  console.log(`   Ping role: ${config.PING_ROLE_ID}`);
+  console.log(`   Callout command: ${config.PREFIX}${config.COMMAND}`);
+  console.log(`   Welcome channel: ${welcomeConfig.WELCOME_CHANNEL_ID}`);
 });
 
 client.login(config.TOKEN).catch(err => {
