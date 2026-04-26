@@ -4,7 +4,7 @@ module.exports = {
 
   EMBED: {
     // Accent color (left border strip)
-    ACCENT_COLOR: 0x2b6cb0,
+    ACCENT_COLOR: 0xe1c47b,
 
     // Banner image at the top — set to null to disable
     BANNER_URL: null,
