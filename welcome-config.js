@@ -1,6 +1,6 @@
 module.exports = {
   // Channel ID where welcome messages are sent
-  WELCOME_CHANNEL_ID: "CHANNEL_ID_HERE",
+  WELCOME_CHANNEL_ID: "1479582866563399688",
 
   EMBED: {
     // Accent color (left border strip)
