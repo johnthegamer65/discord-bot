@@ -9,9 +9,6 @@ module.exports = {
     // Banner image at the top — set to null to disable
     BANNER_URL: null,
 
-    // Thumbnail/badge shown — set to null to disable
-    THUMBNAIL_URL: "https://ik.imagekit.io/8uafykfsx/0f045eb53e69d5c20e14642d96200db6.png?updatedAt=1774713500214",
-
     // Welcome message body
     // {mention} = the new member's @mention
     // {server}  = the server name
