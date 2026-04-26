@@ -1,6 +1,11 @@
 module.exports = {
-  // Your bot token
-  TOKEN: process.env.TOKEN || "MTQ5NzU5NDc1NTY0NTcwMjE1NA.GgjNsC.yL0U9pAlFAh_gj_pWvAcNrmJbP6uaCjEJGhEhI",
+  // Your bot token — set the TOKEN environment variable; never hard-code it here
+  TOKEN: (() => {
+    if (!process.env.TOKEN) {
+      throw new Error("Missing required environment variable: TOKEN. Set it before starting the bot.");
+    }
+    return process.env.TOKEN;
+  })(),
 
   // ----- Command settings -----
   PREFIX: "!",

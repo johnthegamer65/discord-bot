@@ -112,7 +112,7 @@ client.on("guildMemberAdd", async (member) => {
     const container = buildWelcomeComponents(member);
     await channel.send({
       content: `<@${member.id}>`,
-      components: [container],
+      components: [[container]],
       flags: MessageFlags.IsComponentsV2,
     });
   } catch (err) {
@@ -154,7 +154,7 @@ client.on("messageCreate", async (message) => {
     });
 
     await message.channel.send({
-      components: [container],
+      components: [[container]],
       flags: MessageFlags.IsComponentsV2,
     });
   } catch (err) {
