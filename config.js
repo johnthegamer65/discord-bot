@@ -20,7 +20,7 @@ module.exports = {
   TRIGGER_ROLE_ID: ["1479582865980129440", "1479582865980129435"],
 
   // Role that gets pinged when callout is sent
-  PING_ROLE_ID: "1479582865972007051",
+  PING_ROLE_ID: ["1479582865972007051", "1479582865955098659"],
 
   // ----- Embed content -----
   EMBED: {
